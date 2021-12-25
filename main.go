@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/go-git/go-git/v5"
 	"github.com/hillu/go-yara/v4"
 	"io/ioutil"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"errors"
 )
 //go:embed webpages/portal.html
 var indexPage []byte
@@ -22,7 +24,6 @@ func printMatches(item string, m []yara.MatchRule, err error) string{
 		return ""
 	}
 	if len(m) == 0 {
-		log.Printf("%s: no matches", item)
 		return ""
 	}
 	buf := &bytes.Buffer{}
@@ -66,7 +67,6 @@ func setupRoutes() {
 }
 
 func runYara(fileData []byte, fileName string) string{
-
 	c, err := yara.NewCompiler()
 	if err != nil {
 		log.Fatalf("Failed to initialize YARA compiler: %s", err)
@@ -88,5 +88,10 @@ func runYara(fileData []byte, fileName string) string{
 }
 
 func main() {
+	if _, err := os.Stat("./rules/index.yar"); errors.Is(err, os.ErrNotExist) {
+		fmt.Println("Rules directory not found, cloning https://github.com/Yara-Rules/rules")
+		os.Mkdir("rules",0755)
+		git.PlainClone("rules", false, &git.CloneOptions{URL: "https://github.com/Yara-Rules/rules", Progress: os.Stdout})
+	}
 	setupRoutes()
 }
