@@ -73,7 +73,7 @@ func runYara(fileData []byte, fileName string) string{
 		log.Fatalf("Failed to initialize YARA compiler: %s", err)
 	}
 	curDir, _ := os.Getwd()
-	f, err := os.Open(path.Join(curDir,"/rules/index.yar"))
+	f, err := os.Open("/home/yarasea/YaraSea/rules/index.yar")
 	c.AddFile(f,"index")
 
 	r, err := c.GetRules()
