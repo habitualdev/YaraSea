@@ -21,3 +21,7 @@ if res.status_code == 200:
     print(data)
 
 ```
+
+### To Build
+
+Depends on go, libyara-dev(version 4.1), pkg-config, gcc
