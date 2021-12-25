@@ -11,6 +11,7 @@ import (
 	"log"
 	"os"
 	"errors"
+	"path"
 )
 //go:embed webpages/portal.html
 var indexPage []byte
@@ -71,7 +72,8 @@ func runYara(fileData []byte, fileName string) string{
 	if err != nil {
 		log.Fatalf("Failed to initialize YARA compiler: %s", err)
 	}
-	f, err := os.Open("./rules/index.yar")
+	curDir, _ := os.Getwd()
+	f, err := os.Open(path.Join(curDir,"/rules/index.yar"))
 	c.AddFile(f,"index")
 
 	r, err := c.GetRules()
