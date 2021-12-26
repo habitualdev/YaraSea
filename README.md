@@ -25,3 +25,11 @@ if res.status_code == 200:
 ### To Build
 
 Depends on go, libyara-dev(version 4.1), pkg-config, gcc
+
+### Docker Build
+
+Dockerfile builds YaraSea based on Alpine. Requires you to passthrough port 8080.
+```
+docker build -t yarasea .
+docker run -p 8080:8080 yarasea
+```
