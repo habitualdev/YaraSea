@@ -24,11 +24,11 @@ if res.status_code == 200:
 
 ### To Build
 
-Depends on go, libyara-dev(version 4.1), pkg-config, gcc
+Depends on go, libyara-dev(version 4.1), pkg-config, gcc. Not as distributable as a standard go binary, due to reliance on an on-system yaralib.pc dependency. Known working on Ubuntu 21.10. If you have issues running with the standard libyara package distributed by your distro, try compiling yara from source (https://github.com/virustotal/yara).
 
 ### Docker Build
 
-Dockerfile builds YaraSea based on Alpine. Requires you to passthrough port 8080.
+Dockerfile builds YaraSea based on Alpine. Requires you to passthrough port 8080 for external connectivity.
 ```
 docker build -t yarasea .
 docker run -p 8080:8080 yarasea
