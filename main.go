@@ -1,16 +1,17 @@
 package main
 
 import (
+	"bytes"
+	_ "embed"
+	"errors"
+	"fmt"
 	"github.com/go-git/go-git/v5"
 	"github.com/hillu/go-yara/v4"
 	"io/ioutil"
-	"net/http"
-	_ "embed"
-	"bytes"
-	"fmt"
 	"log"
+	"net/http"
 	"os"
-	"errors"
+	"strconv"
 )
 //go:embed webpages/portal.html
 var indexPage []byte
@@ -52,7 +53,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "{\"yara_matches\":\"" + returnString + "\"}" )
 }
 
-func setupRoutes() {
+func setupRoutes(port string) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
@@ -63,7 +64,7 @@ func setupRoutes() {
 		w.Write(portal)
 	})
 	mux.HandleFunc("/upload", uploadFile)
-	http.ListenAndServe(":8080", mux)
+	log.Fatalln(http.ListenAndServe(":" + port, mux))
 }
 
 func runYara(fileData []byte, fileName string) string{
@@ -88,10 +89,27 @@ func runYara(fileData []byte, fileName string) string{
 }
 
 func main() {
+
+	var port string
+
 	if _, err := os.Stat("./rules/index.yar"); errors.Is(err, os.ErrNotExist) {
 		fmt.Println("Rules directory not found, cloning https://github.com/Yara-Rules/rules")
 		os.Mkdir("rules",0755)
 		git.PlainClone("rules", false, &git.CloneOptions{URL: "https://github.com/Yara-Rules/rules", Progress: os.Stdout})
 	}
-	setupRoutes()
+
+	if len(os.Args) > 2{
+		log.Fatalln("Too many arguments")
+	}
+
+	if len(os.Args) == 1{
+		port = "8080"
+	}else {
+		port = os.Args[1]
+		if _, err := strconv.Atoi(port); err!= nil{
+			log.Fatalln("Port not valid.")
+		}
+	}
+
+	setupRoutes(port)
 }
